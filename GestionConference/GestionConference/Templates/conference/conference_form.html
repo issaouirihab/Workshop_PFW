@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+{% if view.object.pk %}
+<h2>Modifier une Conference</h2>
+<a href="{% url 'list_conferences' %}">Liste des conference </a>
+{% else %}
+<h2>Ajouter une Conference</h2>
+{% endif %}
+<form method="post">
+  {% csrf_token %}
+  {{form.as_p}}
+  <button type ="submit">Enregistrer</button>
+</form>
+{% endblock %}

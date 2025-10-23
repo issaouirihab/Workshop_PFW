@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<p>voulez vous Supprimer la conference{{object.name}} ?</p>
+<form method="post">
+  {% csrf_token %}
+  <button type ="submit">Confirmer</button>
+  
+  <a href="{% url 'list_conferences' %}">annuler</a>
+  </form>
+{% endblock %} 
