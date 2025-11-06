@@ -123,3 +123,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'UserApp.User'    
+LOGIN_REDIRECT_URL = "list_conferences"  # Rediriger vers la liste des conférences après la connexion
+LOGOUT_REDIRECT_URL = "login"  # Rediriger vers la page de connexion après la déconnexion
+LOGIN_URL="login"  # URL de la page de connexionma
