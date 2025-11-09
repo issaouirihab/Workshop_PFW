@@ -7,4 +7,6 @@
 <h1>{{conference.start_date}}</h1>
 <h1>{{conference.end_date}}</h1>
 <a href="{% url 'list_conferences' %}">Retour à la liste des conferences</a>
+<a href="{% url 'submission_list' conference.pk %}">Voir les soumissions</a>
+
 {% endblock %}

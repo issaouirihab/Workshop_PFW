@@ -1,5 +1,5 @@
 from django import forms
-from .models import Conference
+from .models import Conference, Submission
 
 class ConferenceModel(forms.ModelForm):
     class Meta:
@@ -18,3 +18,16 @@ class ConferenceModel(forms.ModelForm):
             'start_date':forms.DateInput(attrs={'type':'date','placeholder':'date de debut'}),
             'end_date':forms.DateInput(attrs={'type':'date','placeholder':'date de fin'}),
             }
+class SubmissionForm(forms.ModelForm):
+    class Meta:
+        model = Submission
+        fields = ["title", "abstract", "keywords", "paper"]
+        labels = {
+            "title": "Titre",
+            "abstract": "Résumé",
+            "keywords": "Mots-clés",
+            "paper": "Fichier PDF",
+        }
+        widgets = {
+            "abstract": forms.Textarea(attrs={"rows": 4}),
+        }

@@ -1,0 +1,20 @@
+<h2>Détail de la soumission : {{ submission.title }}</h2>
+
+<p><strong>Auteur :</strong> {{ submission.user_id }}</p>
+<p><strong>Conférence :</strong> {{ submission.Conference.name }}</p>
+<p><strong>Statut :</strong> {{ submission.status }}</p>
+<p><strong>Date de soumission :</strong> {{ submission.submission_date }}</p>
+<p><strong>Résumé :</strong> {{ submission.abstract }}</p>
+<p><strong>Mots-clés :</strong> {{ submission.keywords }}</p>
+
+<p>
+  <strong>Article PDF :</strong>
+  {% if submission.paper %}
+    <a href="{{ submission.paper.url }}" download>Télécharger le PDF</a>
+  {% else %}
+    Aucun fichier.
+  {% endif %}
+</p>
+
+<a href="{% url 'submission_update' submission.pk %}">Modifier</a>
+<a href="{% url 'submission_list' submission.Conference.pk %}">Retour à la liste</a>

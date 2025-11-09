@@ -1,0 +1,7 @@
+<h2>Soumission</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Enregistrer</button>
+</form>
+<a href="{% url 'submission_list' conference.pk %}">Retour à la liste des soumissions</a>
