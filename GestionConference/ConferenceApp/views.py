@@ -41,25 +41,26 @@ class conferenceDelete(LoginRequiredMixin,DeleteView):
 #Submission Views
 class SubmissionListView(LoginRequiredMixin, ListView):
     model = Submission
-    template_name = "conference/submission_list.html"
+    template_name = "conference/submission_list.html"   # tu peux mettre "submission/submission_list.html" si tu veux
     context_object_name = "submissions"
 
     def get_queryset(self):
-        # on récupère l'id de la conf dans l'URL
-        conference_id = self.kwargs.get("conference_id")
-        conf = get_object_or_404(Conference, pk=conference_id)
-        # soumissions de CET utilisateur pour CETTE conf
-        return Submission.objects.filter(
-            Conference=conf,
-            user_id=self.request.user
-        ).order_by('-submission_date')
-    
+        # /conferences/3/submissions/
+        conference = get_object_or_404(Conference, pk=self.kwargs["conference_id"])
+        return (
+            Submission.objects
+            .filter(Conference=conference)
+            .select_related("user_id", "Conference")
+            .order_by('-submission_date')
+        )
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["conference"] = get_object_or_404(Conference, pk=self.kwargs.get("conference_id"))
+        ctx["conference"] = get_object_or_404(Conference, pk=self.kwargs["conference_id"])
         return ctx
 
 
+# 9. Détail d’une soumission
 class SubmissionDetailView(LoginRequiredMixin, DetailView):
     model = Submission
     template_name = "conference/submission_detail.html"
@@ -67,58 +68,67 @@ class SubmissionDetailView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
+        # l’auteur peut voir, le staff peut voir
         if obj.user_id != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied("Vous ne pouvez pas voir cette soumission.")
         return obj
 
+
+# 10. Ajout d’une soumission pour UNE conférence
 class SubmissionCreateView(LoginRequiredMixin, CreateView):
     model = Submission
     form_class = SubmissionForm
     template_name = "conference/submission_form.html"
 
     def form_valid(self, form):
+        # on force la conférence depuis l’URL
         conference = get_object_or_404(Conference, pk=self.kwargs.get("conference_id"))
         form.instance.user_id = self.request.user
         form.instance.Conference = conference
-        # status par défaut = submitted (déjà dans le modèle)
-        response = super().form_valid(form)
-        return response
+        return super().form_valid(form)
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["conference"] = get_object_or_404(Conference, pk=self.kwargs.get("conference_id"))
         return ctx
+
     def get_success_url(self):
+        # retour vers la liste des soumissions de cette conférence
         return reverse("submission_list", args=[self.kwargs.get("conference_id")])
-    
+
+
+# 11. Modification d’une soumission
 class SubmissionUpdateView(LoginRequiredMixin, UpdateView):
     model = Submission
-    form_class = SubmissionForm   # même form mais on va réactiver certains champs
+    form_class = SubmissionForm
     template_name = "conference/submission_form.html"
-
-    # on veut que certains champs ne soient pas modifiables → on peut le faire dans get_form
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # ces champs NE doivent PAS être modifiés
-        if "Conference" in form.fields:
-            form.fields["Conference"].disabled = True
-        return form
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        # sécurité propriétaire
+        # l’auteur ou staff
         if obj.user_id != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied("Vous ne pouvez pas modifier cette soumission.")
-        # blocage selon statut
+        # statut non modifiable
         if obj.status in ("accepted", "rejected"):
             raise PermissionDenied("Une soumission acceptée ou rejetée ne peut pas être modifiée.")
         return obj
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # on empêche de changer la conférence
+        if "Conference" in form.fields:
+            form.fields["Conference"].disabled = True
+        # si tu veux empêcher de modifier le status dans le form :
+        if "status" in form.fields:
+            form.fields["status"].disabled = True
+        return form
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        # ici self.object existe déjà dans l’update
+        ctx["conference"] = self.object.Conference
+        return ctx
+
+
     def get_success_url(self):
-        # revenir à la liste de la conférence liée
+        # retour vers la liste de la conférence liée
         return reverse("submission_list", args=[self.object.Conference.pk])
-
-
-
-
-
-# Create your views here.

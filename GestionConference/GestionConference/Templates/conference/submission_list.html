@@ -30,7 +30,8 @@
         <td>
           <a href="{% url 'submission_detail' sub.pk %}">Détails</a>
           <!-- bouton modifier -->
-          <a href="{% url 'submission_update' sub.pk %}">Modifier</a>
+          <a href="{% url 'submission_edit' sub.pk %}">Modifier</a>
+
         </td>
       </tr>
     {% empty %}

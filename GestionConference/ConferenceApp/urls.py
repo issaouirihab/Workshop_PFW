@@ -9,10 +9,9 @@ urlpatterns = [
     path("<int:pk>/edit/",conferenceUpdate.as_view(),name="conference_edit"),
     path("<int:pk>/delete/",conferenceDelete.as_view(),name="conference_delete"),
 
-
-    path("conference/<int:conference_id>/submissions/", SubmissionListView.as_view(), name="submission_list"),
-    path("conference/<int:conference_id>/submissions/add/", SubmissionCreateView.as_view(), name="submission_add"),
-    path("submissions/<str:pk>/", SubmissionDetailView.as_view(), name="submission_detail"),
-    path("submissions/<str:pk>/edit/", SubmissionUpdateView.as_view(), name="submission_update"),
-    
+    #Submission URLs
+     path("details/<int:conference_id>/submissions/",SubmissionListView.as_view(),name="submission_list"),
+     path("details/<int:conference_id>/submissions/add/",SubmissionCreateView.as_view(),name="submission_add"),
+     path("submissions/<str:pk>/",SubmissionDetailView.as_view(),name="submission_detail"),
+     path("submissions/<str:pk>/edit/",SubmissionUpdateView.as_view(),name="submission_edit"),
 ]
